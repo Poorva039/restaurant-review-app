@@ -59,17 +59,9 @@ app.use('/api/reviews', reviewRoutes);
 app.get('/', (req, res) => {
   res.render('home');  
 });
-// Dashboard Page (you can build this later)
+// Dashboard Page 
 app.get('/dashboard', (req, res) => {
-  res.send(`
-    <html>
-      <body>
-        <h1>Dashboard</h1>
-        <p>Welcome! This is your dashboard.</p>
-        <button onclick="localStorage.removeItem('token'); window.location.href='/'">Logout</button>
-      </body>
-    </html>
-  `);
+  res.render('dashboard');  
 });
 
 // Login Page
