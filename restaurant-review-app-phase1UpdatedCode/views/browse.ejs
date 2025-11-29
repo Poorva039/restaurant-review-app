@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Restaurants - Restaurant Reviews</title>
     <style>
-        /* Copy the same styles from my-reviews.ejs */
+       
         * {
             margin: 0;
             padding: 0;
@@ -366,7 +366,7 @@
 
         reviewsList.innerHTML = reviews
             .map((review) => {
-                // Pick the best available image: image_url → first photo → placeholder
+                
                 const imageUrl =
                     review.image_url ||
                     (review.photos &&
