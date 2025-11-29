@@ -12,7 +12,8 @@ router.get("/", [
   query('perPage').optional().isInt({ min: 1, max: 100 }).withMessage('PerPage must be between 1 and 100'),
   query('minRating').optional().isInt({ min: 1, max: 5 }).withMessage('MinRating must be between 1 and 5'),
   query('city').optional().trim().isLength({ min: 1 }).withMessage('City must not be empty'),
-  query('category').optional().trim().isLength({ min: 1 }).withMessage('Category must not be empty')
+  query('category').optional().trim().isLength({ min: 1 }).withMessage('Category must not be empty'),
+  query('name').optional().trim().isLength({ min: 1 }).withMessage('Name must not be empty')
 ], async (req, res) => {
   try {
     // Check for validation errors
@@ -29,6 +30,7 @@ router.get("/", [
     const city = req.query.city;
     const minRating = parseInt(req.query.minRating);
     const category = req.query.category;
+    const name = req.query.name;
     
     let filter = {};
     if (city) {
@@ -39,6 +41,9 @@ router.get("/", [
     }
     if (category) {
       filter.categories = new RegExp(category, 'i');
+    }
+    if (name) {
+      filter.business_name = new RegExp(name, 'i');
     }
     
     const reviews = await Review.find(filter)
