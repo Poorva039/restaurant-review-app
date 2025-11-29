@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Restaurants - Restaurant Reviews</title>
+    <style>
+        /* Copy the same styles from my-reviews.ejs */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #545b62; }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .filters {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        @media (max-width: 768px) {
+            .filters {
+                grid-template-columns: 1fr;
+            }
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .filter-input {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .review-item {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: 0.3s ease;
+        }
+        .review-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .business-name {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        .review-stars {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .review-meta {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .review-text {
+            color: #495057;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .pagination-btn {
+            padding: 8px 15px;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .pagination-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        .review-layout {
+    display: flex;
+    gap: 20px;
+}
+
+    .review-item {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        transition: 0.3s ease;
+    }
+
+    .review-item:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .review-layout {
+        display: flex;
+        gap: 20px;
+    }
+
+    .review-image-wrapper {
+        flex: 0 0 200px;
+    }
+
+    .review-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .review-content {
+        flex: 1;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    .pagination-btn {
+        padding: 6px 12px;
+        border: 1px solid #dee2e6;
+        background: white;
+        border-radius: 5px;
+        cursor: pointer;
+        min-width: 32px;
+    }
+
+    .pagination-btn.active {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    .pagination-btn.disabled {
+        opacity: 0.4;
+        cursor: default;
+    }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="top-bar">
+                <h1>Browse Restaurants</h1>
+                <a href="/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+            <p>Discover restaurants and read reviews from our community</p>
+        </div>
+
+        <div class="card">
+            <div class="filters">
+                <div class="filter-group">
+                    <label class="filter-label">City</label>
+                    <input type="text" id="filterCity" class="filter-input" placeholder="Any city">
+                </div>
+                <div class="filter-group">
+    <label class="filter-label">Restaurant Name</label>
+    <input type="text" id="filterName" class="filter-input" placeholder="Search by name">
+</div>
+
+                <div class="filter-group">
+                    <label class="filter-label">Category</label>
+                    <input type="text" id="filterCategory" class="filter-input" placeholder="Any category">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Min Rating</label>
+                    <select id="filterMinRating" class="filter-input">
+                        <option value="">Any rating</option>
+                        <option value="5">5 stars</option>
+                        <option value="4">4+ stars</option>
+                        <option value="3">3+ stars</option>
+                        <option value="2">2+ stars</option>
+                        <option value="1">1+ stars</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">&nbsp;</label>
+                    <button class="btn" onclick="applyFilters()" style="height: 42px;">Search</button>
+                </div>
+            </div>
+
+            <div id="reviewsList">
+                <div class="loading">Loading restaurants...</div>
+            </div>
+
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <script>
+    let currentPage = 1;
+    const reviewsPerPage = 10;
+    let currentFilters = {};
+
+    // initial load
+    loadRestaurants();
+
+    async function loadRestaurants(page = 1, filters = {}) {
+        try {
+            const params = new URLSearchParams({
+                page,
+                perPage: reviewsPerPage,
+                ...filters
+            });
+
+            const response = await fetch(`/api/reviews?${params}`);
+            const data = await response.json();
+
+            if (data.success) {
+                displayRestaurants(data.data, data.pagination);
+            } else {
+                showError('Failed to load restaurants');
+            }
+        } catch (error) {
+            console.error('Error loading restaurants:', error);
+            showError('Network error. Please try again.');
+        }
+    }
+
+    function renderPagination(pagination) {
+        const paginationContainer = document.getElementById('pagination');
+        const totalPages = pagination.totalPages;
+        const currentPage = pagination.page;
+
+        if (!totalPages || totalPages <= 1) {
+            paginationContainer.innerHTML = '';
+            return;
+        }
+
+        const maxButtons = 10; // show up to 10 page numbers
+        let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+        let endPage = startPage + maxButtons - 1;
+
+        if (endPage > totalPages) {
+            endPage = totalPages;
+            startPage = Math.max(1, endPage - maxButtons + 1);
+        }
+
+        let html = '';
+
+        // First page << and previous <
+        if (currentPage > 1) {
+            html += `<button class="pagination-btn" onclick="changePage(1)">««</button>`;
+            html += `<button class="pagination-btn" onclick="changePage(${currentPage - 1})">«</button>`;
+        } else {
+            html += `<button class="pagination-btn disabled">««</button>`;
+            html += `<button class="pagination-btn disabled">«</button>`;
+        }
+
+        // Numbered pages 1..10
+        for (let i = startPage; i <= endPage; i++) {
+            html += `
+                <button
+                    class="pagination-btn ${i === currentPage ? 'active' : ''}"
+                    onclick="changePage(${i})"
+                >
+                    ${i}
+                </button>
+            `;
+        }
+
+        // Next > and last >>
+        if (currentPage < totalPages) {
+            html += `<button class="pagination-btn" onclick="changePage(${currentPage + 1})">»</button>`;
+            html += `<button class="pagination-btn" onclick="changePage(${totalPages})">»»</button>`;
+        } else {
+            html += `<button class="pagination-btn disabled">»</button>`;
+            html += `<button class="pagination-btn disabled">»»</button>`;
+        }
+
+        paginationContainer.innerHTML = html;
+    }
+
+    function displayRestaurants(reviews, pagination) {
+        const reviewsList = document.getElementById('reviewsList');
+        const paginationContainer = document.getElementById('pagination');
+
+        if (!Array.isArray(reviews) || reviews.length === 0) {
+            reviewsList.innerHTML = `
+                <div class="empty-state">
+                    <div style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;">🔍</div>
+                    <h3>No Restaurants Found</h3>
+                    <p>Try adjusting your search filters.</p>
+                </div>
+            `;
+            paginationContainer.innerHTML = '';
+            return;
+        }
+
+        // For debugging – check in browser console what one review looks like
+        console.log("Sample review from API:", reviews[0]);
+
+        reviewsList.innerHTML = reviews
+            .map((review) => {
+                // Pick the best available image: image_url → first photo → placeholder
+                const imageUrl =
+                    review.image_url ||
+                    (review.photos &&
+                        review.photos.length > 0 &&
+                        review.photos[0].photo_url) ||
+                    "https://via.placeholder.com/200x150?text=No+Image";
+
+                return `
+                <div class="review-item" onclick="goToReview('${review._id}')">
+                    <div class="review-layout">
+                        <div class="review-image-wrapper">
+                            <img
+                                src="${imageUrl}"
+                                alt="${review.business_name}"
+                                class="review-image"
+                                onerror="this.src='https://via.placeholder.com/200x150?text=No+Image';"
+                            />
+                        </div>
+                        <div class="review-content">
+                            <div class="review-header">
+                                <div class="business-name">
+                                    <a href="/restaurants/${encodeURIComponent(review.business_name)}" class="business-name">
+                                        ${review.business_name}
+                                    </a>
+                                </div>
+                                <div class="review-stars">
+                                    ${'★'.repeat(review.review_stars)}${'☆'.repeat(5 - review.review_stars)}
+                                    ${review.review_stars}/5
+                                </div>
+                            </div>
+                            <div class="review-meta">
+                                ${review.location && review.location.city
+                                    ? `${review.location.city}`
+                                    : 'Location not specified'}
+                                ${review.categories && review.categories.length > 0
+                                    ? ` • ${review.categories.join(', ')}`
+                                    : ''}
+                                • Reviewed on ${new Date(review.review_date).toLocaleDateString()}
+                            </div>
+                            <div class="review-text">
+                                ${review.review_text}
+                            </div>
+                            <div class="review-meta">
+                                By ${review.user_name}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            })
+            .join('');
+
+        renderPagination(pagination);
+    }
+
+    function goToReview(id) {
+        window.location.href = `/reviews/${id}`;
+    }
+
+    function applyFilters() {
+        currentFilters = {};
+        currentPage = 1;
+
+        const city = document.getElementById('filterCity').value;
+        const category = document.getElementById('filterCategory').value;
+        const minRating = document.getElementById('filterMinRating').value;
+        const name = document.getElementById('filterName').value;
+
+        if (name) currentFilters.name = name;
+        if (city) currentFilters.city = city;
+        if (category) currentFilters.category = category;
+        if (minRating) currentFilters.minRating = minRating;
+
+        loadRestaurants(1, currentFilters);
+    }
+
+    function changePage(page) {
+        currentPage = page;
+        loadRestaurants(page, currentFilters);
+    }
+
+    function showError(message) {
+        const reviewsList = document.getElementById('reviewsList');
+        reviewsList.innerHTML = `
+            <div class="empty-state">
+                <div style="color: #e74c3c; font-size: 3rem; margin-bottom: 15px;">❌</div>
+                <h3>Error</h3>
+                <p>${message}</p>
+                <button class="btn btn-primary" onclick="loadRestaurants()" style="margin-top: 15px;">
+                    Try Again
+                </button>
+            </div>
+        `;
+    }
+
+    // Allow Enter key to apply filters
+    document.getElementById('filterCity').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') applyFilters();
+    });
+    document.getElementById('filterCategory').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') applyFilters();
+        
+    });
+    document.getElementById('filterName').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') applyFilters();
+    });
+</script>
+
+</body>
+</html>
