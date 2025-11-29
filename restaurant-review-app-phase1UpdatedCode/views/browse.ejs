@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Restaurants - Restaurant Reviews</title>
     <style>
-       
+        /* Copy the same styles from my-reviews.ejs */
         * {
             margin: 0;
             padding: 0;
@@ -233,6 +233,11 @@
                     <input type="text" id="filterCity" class="filter-input" placeholder="Any city">
                 </div>
                 <div class="filter-group">
+    <label class="filter-label">Restaurant Name</label>
+    <input type="text" id="filterName" class="filter-input" placeholder="Search by name">
+</div>
+
+                <div class="filter-group">
                     <label class="filter-label">Category</label>
                     <input type="text" id="filterCategory" class="filter-input" placeholder="Any category">
                 </div>
@@ -366,7 +371,7 @@
 
         reviewsList.innerHTML = reviews
             .map((review) => {
-                
+                // Pick the best available image: image_url → first photo → placeholder
                 const imageUrl =
                     review.image_url ||
                     (review.photos &&
@@ -433,7 +438,9 @@
         const city = document.getElementById('filterCity').value;
         const category = document.getElementById('filterCategory').value;
         const minRating = document.getElementById('filterMinRating').value;
+        const name = document.getElementById('filterName').value;
 
+        if (name) currentFilters.name = name;
         if (city) currentFilters.city = city;
         if (category) currentFilters.category = category;
         if (minRating) currentFilters.minRating = minRating;
@@ -460,11 +467,15 @@
         `;
     }
 
-    // Allow Enter key to apply filters
+    
     document.getElementById('filterCity').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') applyFilters();
     });
     document.getElementById('filterCategory').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') applyFilters();
+        
+    });
+    document.getElementById('filterName').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') applyFilters();
     });
 </script>
