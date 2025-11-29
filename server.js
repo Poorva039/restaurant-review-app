@@ -188,16 +188,15 @@ app.use((err, req, res, next) => {
     message: 'Server Error'
   });
 });
-
-//const PORT = process.env.PORT || 3000;
-
-// server.js – local only
-const app = require('./api/index'); // reuse the same app
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+// server.js – local only
+//const app = require('./api/index'); // reuse the same app
+//const PORT = process.env.PORT || 3000;
+
+//app.listen(PORT, () => {
+//  console.log(`Server running at http://localhost:${PORT}`);
+//});
 
 app.listen(PORT, () => {
   console.log(` Server running on port ${PORT}`);
