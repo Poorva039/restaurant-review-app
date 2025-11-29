@@ -77,10 +77,17 @@ router.post('/image', upload.single('image'), async (req, res) => {
     return res.json({ success: true, url });
   } catch (err) {
     console.error('GitHub upload error:', err);
+
+    // Return the full error message to frontend (TEMPORARY)
     return res
       .status(500)
-      .json({ success: false, message: 'Upload failed' });
+      .json({ 
+        success: false, 
+        message: err.message || 'Upload failed',
+        error: err
+      });
   }
 });
+
 
 module.exports = router;
