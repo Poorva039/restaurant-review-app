@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Review - Restaurant Reviews</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #1e7e34; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #545b62; }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .star-rating {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .star {
+            font-size: 2rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .star:hover,
+        .star.active {
+            color: #ffc107;
+        }
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        #imagePreview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+        .small-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="top-bar">
+                <h1>Add New Review</h1>
+                <a href="/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <form id="reviewForm">
+                <div class="form-group">
+                    <label for="business_name">Restaurant Name *</label>
+                    <input type="text" id="business_name" required placeholder="Enter restaurant name">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="location_city">City</label>
+                        <input type="text" id="location_city" placeholder="Enter city">
+                    </div>
+                    <div class="form-group">
+                        <label for="categories">Category</label>
+                        <input type="text" id="categories" placeholder="e.g., Italian, Chinese, Mexican">
+                    </div>
+                </div>
+
+                <!-- Image upload (auto upload on submit) -->
+                <div class="form-group">
+                    <label for="image_file">Image (optional)</label>
+                    <input type="file" id="image_file" accept="image/*">
+                    <div class="small-text">
+                        If you choose an image, it will be uploaded to GitHub automatically when you submit.
+                    </div>
+                    <small id="uploadStatus" style="display:block; margin-top:5px; color:#6c757d;"></small>
+
+                    <div id="imagePreview" style="margin-top:10px; display:none;">
+                        <img id="previewImg" src="" alt="Preview">
+                    </div>
+                </div>
+                <input type="hidden" id="image_url">
+
+                <div class="form-group">
+                    <label>Your Rating *</label>
+                    <div class="star-rating" id="starRating">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+                    <input type="hidden" id="review_stars" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="review_text">Your Review *</label>
+                    <textarea id="review_text" required placeholder="Share your experience... What did you like? What could be improved?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="review_date">Visit Date</label>
+                    <input type="date" id="review_date">
+                </div>
+
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    Submit Review
+                </button>
+            </form>
+
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (!token || !user) {
+            window.location.href = '/login';
+        }
+
+        // --- star rating ---
+        const stars = document.querySelectorAll('.star');
+        let selectedRating = 0;
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.getAttribute('data-rating'));
+                document.getElementById('review_stars').value = selectedRating;
+                
+                stars.forEach(s => {
+                    const rating = parseInt(s.getAttribute('data-rating'));
+                    if (rating <= selectedRating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+            });
+
+            star.addEventListener('mouseover', () => {
+                const rating = parseInt(star.getAttribute('data-rating'));
+                stars.forEach(s => {
+                    const sRating = parseInt(s.getAttribute('data-rating'));
+                    if (sRating <= rating) {
+                        s.style.color = '#ffc107';
+                    }
+                });
+            });
+
+            star.addEventListener('mouseout', () => {
+                stars.forEach(s => {
+                    const rating = parseInt(s.getAttribute('data-rating'));
+                    if (rating > selectedRating) {
+                        s.style.color = '#ddd';
+                    }
+                });
+            });
+        });
+
+        // Local preview of image (no upload yet)
+        document.getElementById('image_file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            const uploadStatus = document.getElementById('uploadStatus');
+
+            if (file) {
+                const url = URL.createObjectURL(file);
+                previewImg.src = url;
+                preview.style.display = 'block';
+                uploadStatus.textContent = 'Image selected. It will be uploaded when you submit.';
+                uploadStatus.style.color = '#6c757d';
+            } else {
+                preview.style.display = 'none';
+                uploadStatus.textContent = '';
+            }
+        });
+
+        // --- form submission with auto image upload ---
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const uploadStatus = document.getElementById('uploadStatus');
+
+            if (selectedRating === 0) {
+                showMessage('Please select a rating', 'error');
+                return;
+            }
+
+            let finalImageUrl = document.getElementById('image_url').value || '';
+            const fileInput = document.getElementById('image_file');
+
+            try {
+                // 1) If a file is selected, upload image to GitHub first
+                if (fileInput.files.length) {
+                    uploadStatus.textContent = 'Uploading image...';
+                    uploadStatus.style.color = '#6c757d';
+
+                    const file = fileInput.files[0];
+                    const formData = new FormData();
+                    formData.append('image', file);
+
+                    const uploadRes = await fetch('/api/uploads/image', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                            // Don't set Content-Type here, browser will set multipart/form-data with boundary
+                        },
+                        body: formData
+                    });
+
+                    const uploadData = await uploadRes.json();
+
+                    if (!uploadRes.ok || !uploadData.success) {
+                        uploadStatus.textContent = uploadData.message || 'Image upload failed.';
+                        uploadStatus.style.color = '#e74c3c';
+                        showMessage('Image upload failed. Review not submitted.', 'error');
+                        return;
+                    }
+
+                    finalImageUrl = uploadData.url;
+                    document.getElementById('image_url').value = finalImageUrl;
+
+                    uploadStatus.textContent = 'Image uploaded successfully.';
+                    uploadStatus.style.color = '#28a745';
+                }
+
+                // 2) Now submit the review with image_url (or blank if no image)
+                const reviewData = {
+                    business_name: document.getElementById('business_name').value,
+                    user_name: user.username,
+                    review_stars: selectedRating,
+                    review_text: document.getElementById('review_text').value,
+                    review_date: document.getElementById('review_date').value || new Date().toISOString().split('T')[0],
+                    categories: document.getElementById('categories').value
+                        ? [document.getElementById('categories').value]
+                        : [],
+                    location: {
+                        city: document.getElementById('location_city').value || ''
+                    },
+                    image_url: finalImageUrl || '',
+                    review_id: 'rev_' + Date.now()
+                };
+
+                const response = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(reviewData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('Review submitted successfully! Redirecting...', 'success');
+                    document.getElementById('reviewForm').reset();
+                    stars.forEach(star => star.classList.remove('active'));
+                    selectedRating = 0;
+                    document.getElementById('imagePreview').style.display = 'none';
+                    uploadStatus.textContent = '';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    if (data.errors) {
+                        showMessage(data.errors.map(error => error.msg || error).join(', '), 'error');
+                    } else {
+                        showMessage(data.message || 'Failed to submit review', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                showMessage('Network error. Please try again.', 'error');
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // default date = today
+        document.getElementById('review_date').value = new Date().toISOString().split('T')[0];
+
+        // pre-fill restaurant from ?restaurant=
+        const params = new URLSearchParams(window.location.search);
+        const rName = params.get('restaurant');
+        if (rName) {
+            document.getElementById('business_name').value = rName;
+        }
+    </script>
+</body>
+</html>
