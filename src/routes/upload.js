@@ -10,7 +10,8 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 });
 
-// ---- Lazy ESM import for @octokit/rest ----
+/* ---------- Lazy ESM import for @octokit/rest ---------- */
+
 let octokitClientPromise = null;
 
 async function getOctokit() {
@@ -25,32 +26,29 @@ async function getOctokit() {
   return octokitClientPromise;
 }
 
-// ---- Helper to upload file to GitHub ----
-  async function uploadToGithub(buffer, originalName) {
-    const owner = process.env.GITHUB_OWNER;
-    const repo = process.env.GITHUB_REPO;
-    const branch = process.env.GITHUB_BRANCH || 'main';
-    const uploadDir = process.env.GITHUB_UPLOAD_DIR || 'photos';
+/* ---------- Helper: upload file to GitHub ---------- */
 
-    // DEBUG: log what Vercel actually sees
-    console.log('UPLOAD ENV DEBUG:', {
-      owner,
-      repo,
-      branch,
-      uploadDir,
-      hasToken: !!process.env.GITHUB_TOKEN,
-    });
+async function uploadToGithub(buffer, originalName) {
+  const owner = process.env.GITHUB_OWNER;
+  const repo = process.env.GITHUB_REPO;
+  const branch = process.env.GITHUB_BRANCH || 'main';
+  const uploadDir = process.env.GITHUB_UPLOAD_DIR || 'photos';
+
+  console.log('UPLOAD ENV DEBUG:', {
+    owner,
+    repo,
+    branch,
+    uploadDir,
+    hasToken: !!process.env.GITHUB_TOKEN
+  });
 
   if (!owner || !repo || !process.env.GITHUB_TOKEN) {
-    console.error('Missing envs:', {
-      owner,
-      repo,
-      hasToken: !!process.env.GITHUB_TOKEN,
-    });
     throw new Error('Missing GitHub configuration env vars');
   }
 
-  // Make a safe filename
+  const octokit = await getOctokit(); // ✅ octokit defined here
+
+  // Safe filename
   const safeName = (originalName || 'image')
     .toLowerCase()
     .replace(/[^a-z0-9.\-_]/g, '-')
@@ -70,12 +68,13 @@ async function getOctokit() {
     content: contentEncoded
   });
 
-  // Public raw URL (same pattern as your dataset images)
+  // Public raw URL (same style as your dataset images)
   const url = `https://github.com/${owner}/${repo}/raw/${branch}/${path}`;
   return url;
 }
 
-// ---- Route: POST /api/uploads/image ----
+/* ---------- Route: POST /api/uploads/image ---------- */
+
 router.post('/image', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
@@ -89,17 +88,11 @@ router.post('/image', upload.single('image'), async (req, res) => {
     return res.json({ success: true, url });
   } catch (err) {
     console.error('GitHub upload error:', err);
-
-    // Return the full error message to frontend (TEMPORARY)
-    return res
-      .status(500)
-      .json({ 
-        success: false, 
-        message: err.message || 'Upload failed',
-        error: err
-      });
+    return res.status(500).json({
+      success: false,
+      message: err.message || 'Upload failed'
+    });
   }
 });
-
 
 module.exports = router;
