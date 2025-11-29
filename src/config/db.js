@@ -7,9 +7,8 @@ if (!MONGODB_URI) {
   throw new Error('❌ Please define the MONGODB_URI environment variable.');
 }
 
-// Cache the connection across hot reloads / serverless invocations
+// Cache connection across hot reloads / serverless invocations
 let cached = global.mongoose;
-
 if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
 }
@@ -21,11 +20,9 @@ async function connectDB() {
   }
 
   if (!cached.promise) {
+    // IMPORTANT: no useNewUrlParser / useUnifiedTopology here
     cached.promise = mongoose
-      .connect(MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      })
+      .connect(MONGODB_URI)
       .then((mongooseInstance) => {
         console.log('✅ MongoDB connected');
         return mongooseInstance;
