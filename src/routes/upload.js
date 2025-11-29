@@ -26,15 +26,27 @@ async function getOctokit() {
 }
 
 // ---- Helper to upload file to GitHub ----
-async function uploadToGithub(buffer, originalName) {
-  const octokit = await getOctokit();
+  async function uploadToGithub(buffer, originalName) {
+    const owner = process.env.GITHUB_OWNER;
+    const repo = process.env.GITHUB_REPO;
+    const branch = process.env.GITHUB_BRANCH || 'main';
+    const uploadDir = process.env.GITHUB_UPLOAD_DIR || 'photos';
 
-  const owner = process.env.GITHUB_OWNER;
-  const repo = process.env.GITHUB_REPO;
-  const branch = process.env.GITHUB_BRANCH || 'main';
-  const uploadDir = process.env.GITHUB_UPLOAD_DIR || 'photos';
+    // DEBUG: log what Vercel actually sees
+    console.log('UPLOAD ENV DEBUG:', {
+      owner,
+      repo,
+      branch,
+      uploadDir,
+      hasToken: !!process.env.GITHUB_TOKEN,
+    });
 
   if (!owner || !repo || !process.env.GITHUB_TOKEN) {
+    console.error('Missing envs:', {
+      owner,
+      repo,
+      hasToken: !!process.env.GITHUB_TOKEN,
+    });
     throw new Error('Missing GitHub configuration env vars');
   }
 
