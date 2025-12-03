@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Restaurant Reviews</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #545b62; }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #1e7e34; }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        .contact-info {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+        .info-icon {
+            background: #007bff;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .info-content h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .info-content p {
+            color: #6c757d;
+            line-height: 1.5;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+        .faq-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+        }
+        .faq-item {
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .faq-question {
+            padding: 15px;
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-answer {
+            padding: 15px;
+            display: none;
+            color: #495057;
+            line-height: 1.6;
+        }
+        .required {
+            color: #e74c3c;
+        }
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="top-bar">
+                <div>
+                    <h1>Contact Us</h1>
+                    <p class="subtitle">Have questions, suggestions, or feedback? We'd love to hear from you!</p>
+                </div>
+                <a href="/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="contact-grid">
+                <!-- Contact Form -->
+                <div class="contact-form">
+                    <h2>Send us a Message</h2>
+                    <p style="margin-bottom: 25px; color: #6c757d;">Fill out the form below and we'll get back to you as soon as possible.</p>
+                    
+                    <div id="successMessage" class="success-message">
+                        ✓ Thank you for your message! We'll get back to you soon.
+                    </div>
+                    
+                    <div id="loading" class="loading">
+                        Sending your message...
+                    </div>
+                    
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Full Name <span class="required">*</span></label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Subject <span class="required">*</span></label>
+                            <select id="subject" name="subject" required>
+                                <option value="">Select a subject</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="support">Technical Support</option>
+                                <option value="feedback">Feedback & Suggestions</option>
+                                <option value="business">Business Partnership</option>
+                                <option value="report">Report an Issue</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Message <span class="required">*</span></label>
+                            <textarea id="message" name="message" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="newsletter" name="newsletter">
+                                Subscribe to our newsletter for updates and tips
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success" style="width: 100%; padding: 15px; font-size: 18px;">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="contact-info">
+                    <h2>Get in Touch</h2>
+                    <p style="margin-bottom: 30px; color: #6c757d;">Here are other ways to reach us:</p>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">📍</div>
+                        <div class="info-content">
+                            <h3>Our Location</h3>
+                            <p>Humber College<br>Toronto, Ontario<br>Canada</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">📧</div>
+                        <div class="info-content">
+                            <h3>Email Us</h3>
+                            <p>support@restaurantreviews.com<br>Response time: Within 24 hours</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">📞</div>
+                        <div class="info-content">
+                            <h3>Call Us</h3>
+                            <p>+1 (416) 123-4567<br>Monday - Friday, 9 AM - 6 PM EST</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">🕒</div>
+                        <div class="info-content">
+                            <h3>Business Hours</h3>
+                            <p>Monday - Friday: 9:00 AM - 6:00 PM<br>Saturday: 10:00 AM - 4:00 PM<br>Sunday: Closed</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: white; border-radius: 8px;">
+                        <h3 style="margin-bottom: 10px;">Emergency Support</h3>
+                        <p style="color: #6c757d; margin-bottom: 10px;">For urgent technical issues:</p>
+                        <p style="font-weight: bold; color: #e74c3c;">emergency@restaurantreviews.com</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FAQ Section -->
+            <div class="faq-section">
+                <h2>Frequently Asked Questions</h2>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        How long does it take to get a response?
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        We typically respond to all inquiries within 24 hours during business days. For urgent matters, please use our emergency support email.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        Can I suggest a restaurant to be added?
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Yes! We welcome restaurant suggestions. Please use the "Feedback & Suggestions" subject in the contact form or email us directly.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        How can I report inappropriate content?
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Please use the "Report an Issue" subject in the contact form. Include the review ID and the reason for your report. We review all reports within 48 hours.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        Do you have a mobile app?
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Our website is fully responsive and works great on mobile devices. We're currently developing a native mobile app - stay tuned!
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        How do I delete my account?
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        Account deletion can be requested through the "General Inquiry" form. Please include your username and reason for deletion. Note: This action is permanent.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // If not on dashboard, redirect to home
+            if (!window.location.pathname.includes('dashboard')) {
+                window.location.href = '/';
+            }
+        }
+
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const loading = document.getElementById('loading');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            loading.style.display = 'block';
+            successMessage.style.display = 'none';
+            
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value,
+                newsletter: document.getElementById('newsletter').checked,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                // Simulate API call - in real implementation, you would send this to your backend
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Show success message
+                successMessage.style.display = 'block';
+                form.reset();
+                
+                // Scroll to success message
+                successMessage.scrollIntoView({ behavior: 'smooth' });
+                
+                // Log to console (in production, this would go to your backend)
+                console.log('Contact form submitted:', formData);
+                
+            } catch (error) {
+                alert('Failed to send message. Please try again.');
+                console.error('Error submitting form:', error);
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message';
+                loading.style.display = 'none';
+            }
+        });
+
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('span');
+            
+            if (answer.style.display === 'block') {
+                answer.style.display = 'none';
+                icon.textContent = '▼';
+            } else {
+                answer.style.display = 'block';
+                icon.textContent = '▲';
+            }
+        }
+
+        // Initialize FAQ - open first one
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstFAQ = document.querySelector('.faq-item');
+            if (firstFAQ) {
+                const answer = firstFAQ.querySelector('.faq-answer');
+                const icon = firstFAQ.querySelector('.faq-question span');
+                answer.style.display = 'block';
+                icon.textContent = '▲';
+            }
+        });
+    </script>
+</body>
+</html>

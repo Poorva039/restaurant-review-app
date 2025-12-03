@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= restaurant.business_name %> - Restaurant</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      min-height:100vh;
+      padding:20px;
+    }
+    .container { max-width: 1000px; margin:0 auto; }
+    .header {
+      background:white;
+      padding:30px;
+      border-radius:20px;
+      box-shadow:0 20px 40px rgba(0,0,0,.1);
+      margin-bottom:30px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .btn {
+      padding:10px 18px;
+      border-radius:10px;
+      background:#6c757d;
+      color:white;
+      border:none;
+      font-weight:bold;
+      cursor:pointer;
+      text-decoration:none;
+    }
+    .btn:hover { background:#545b62; }
+    .card {
+      background:white;
+      padding:30px;
+      border-radius:15px;
+      box-shadow:0 10px 30px rgba(0,0,0,.1);
+      margin-bottom:20px;
+    }
+    .title { font-size:2rem; font-weight:bold; color:#2c3e50; margin-bottom:5px; }
+    .meta { color:#7f8c8d; margin-bottom:10px; }
+    .stars { color:#ffc107; font-weight:bold; margin-bottom:10px; }
+    .image-wrapper { margin:15px 0; }
+    .image-wrapper img {
+      width:100%;
+      max-height:350px;
+      object-fit:cover;
+      border-radius:12px;
+    }
+    .review-item { border-top:1px solid #e9ecef; padding-top:20px; margin-top:20px; }
+    .review-header { display:flex; justify-content:space-between; margin-bottom:5px; }
+    .review-text { color:#34495e; margin:8px 0; }
+    .review-by { color:#7f8c8d; font-size:.9rem; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Restaurant</h1>
+    <div>
+      <a href="/browse" class="btn">← Back to Browse</a>
+      <a href="/dashboard" class="btn" style="margin-left:10px;">Dashboard</a>
+    </div>
+  </div>
+
+  <div class="card">
+  <% 
+    const imgUrl =
+      restaurant.image_url ||
+      (restaurant.photos && restaurant.photos.length && restaurant.photos[0].photo_url) ||
+      'https://via.placeholder.com/800x350?text=No+Image';
+  %>
+
+  <!-- Title + Add Review -->
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="title"><%= restaurant.business_name %></div>
+
+      <a 
+          href="/add-review?restaurant=<%= encodeURIComponent(restaurant.business_name) %>"
+          class="btn btn-primary"
+          style="background:#007bff; margin-left:15px;"
+      >
+          Add Review
+      </a>
+  </div>
+
+  <!-- Location + Categories -->
+  <div class="meta">
+      <% if (restaurant.location && restaurant.location.city) { %>
+        <%= restaurant.location.city %>
+      <% } %>
+
+      <% if (restaurant.categories && restaurant.categories.length) { %>
+        • <%= restaurant.categories.join(', ') %>
+      <% } %>
+  </div>
+
+  <!-- Rating -->
+  <div class="stars">
+    <% for (let i = 0; i < Math.round(avgRating); i++) { %>★<% } %>
+    <% for (let i = Math.round(avgRating); i < 5; i++) { %>☆<% } %>
+    <%= avgRating %>/5  •  <%= totalReviews %> review<%= totalReviews > 1 ? 's' : '' %>
+  </div>
+
+  <!-- Main Image -->
+  <div class="image-wrapper">
+    <img src="<%= imgUrl %>" alt="<%= restaurant.business_name %>">
+  </div>
+
+  <!-- Reviews -->
+  <h3>Reviews</h3>
+  <% reviews.forEach(r => { %>
+    <div class="review-item">
+      <div class="review-header">
+        <div class="stars">
+          <% for (let i = 0; i < r.review_stars; i++) { %>★<% } %>
+          <% for (let i = r.review_stars; i < 5; i++) { %>☆<% } %>
+          <%= r.review_stars %>/5
+        </div>
+        <div class="meta"><%= new Date(r.review_date).toLocaleDateString() %></div>
+      </div>
+
+      <div class="review-text"><%= r.review_text %></div>
+      <div class="review-by">By <strong><%= r.user_name %></strong></div>
+    </div>
+  <% }) %>
+</div> 
+
+</div>
+</body>
+</html>
