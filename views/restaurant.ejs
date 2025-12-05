@@ -54,7 +54,84 @@
     .review-header { display:flex; justify-content:space-between; margin-bottom:5px; }
     .review-text { color:#34495e; margin:8px 0; }
     .review-by { color:#7f8c8d; font-size:.9rem; }
+    .section-title {
+      margin-top: 25px;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .attributes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px 30px;
+      margin-top: 8px;
+    }
+
+    .attribute-item {
+      font-size: 0.95rem;
+      color: #495057;
+    }
+
+    .attribute-item strong {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .divider {
+      margin: 18px 0;
+      border: none;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .map-container {
+    margin-top: 20px;
+    margin-bottom: 25px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+
+
   </style>
+    <% 
+    function prettySimple(value) {
+      if (!value) return null;
+      if (typeof value === 'string') {
+        let v = value.trim();
+        v = v.replace(/^u'/, '').replace(/^'/, '').replace(/'$/, '');
+        v = v.replace(/^u"/, '').replace(/^"/, '').replace(/"$/, '');
+        v = v.replace(/_/g, ' ');
+        if (v.toLowerCase() === 'none') return 'None';
+        return v.charAt(0).toUpperCase() + v.slice(1);
+      }
+      return String(value);
+    }
+
+    function prettyBool(value) {
+      if (value === true || value === 'True' || value === 'true' || value === '1') return 'Yes';
+      if (value === false || value === 'False' || value === 'false' || value === '0') return 'No';
+      return value;
+    }
+
+    function extractTrueLabels(pyDictStr) {
+      if (!pyDictStr || typeof pyDictStr !== 'string') return null;
+      const regex = /'([^']+)':\s*(True|False|None)/g;
+      const labels = [];
+      let match;
+      while ((match = regex.exec(pyDictStr)) !== null) {
+        if (match[2] === 'True') {
+          let label = match[1].replace(/_/g, ' ');
+          label = label.charAt(0).toUpperCase() + label.slice(1);
+          labels.push(label);
+        }
+      }
+      return labels.length ? labels.join(', ') : null;
+    }
+  %>
+
 </head>
 <body>
 <div class="container">
@@ -89,14 +166,25 @@
 
   <!-- Location + Categories -->
   <div class="meta">
-      <% if (restaurant.location && restaurant.location.city) { %>
-        <%= restaurant.location.city %>
+      <% if (restaurant.location) { %>
+          <% if (restaurant.location.address) { %>
+              <%= restaurant.location.address %>,
+          <% } %>
+          <% if (restaurant.location.city) { %>
+              <%= restaurant.location.city %>,
+          <% } %>
+          <% if (restaurant.location.state) { %>
+              <%= restaurant.location.state %>
+          <% } %>
+          <% if (restaurant.location.postal_code) { %>
+              <%= restaurant.location.postal_code %>
+          <% } %>
       <% } %>
 
-      <% if (restaurant.categories && restaurant.categories.length) { %>
-        • <%= restaurant.categories.join(', ') %>
-      <% } %>
-  </div>
+           
+
+      
+
 
   <!-- Rating -->
   <div class="stars">
@@ -110,8 +198,83 @@
     <img src="<%= imgUrl %>" alt="<%= restaurant.business_name %>">
   </div>
 
+  <% if (restaurant.business_attributes) { 
+       const attrs = restaurant.business_attributes;
+  %>
+    <hr class="divider">
+
+    <div>
+      <div class="section-title">Restaurant Details</div>
+      <div class="attributes-grid">
+
+        <div class="attribute-item">
+          <strong>Wi-Fi:</strong>
+          <%= prettySimple(attrs.WiFi) || 'Not specified' %>
+        </div>
+
+        <div class="attribute-item">
+          <strong>Take-out:</strong>
+          <%= prettyBool(attrs.RestaurantsTakeOut) || 'Not specified' %>
+        </div>
+
+        <div class="attribute-item">
+          <strong>Delivery:</strong>
+          <%= prettyBool(attrs.RestaurantsDelivery) || 'Not specified' %>
+        </div>
+
+        <div class="attribute-item">
+          <strong>Outdoor seating:</strong>
+          <%= prettyBool(attrs.OutdoorSeating) || 'Not specified' %>
+        </div>
+
+        <div class="attribute-item">
+          <strong>Good for kids:</strong>
+          <%= prettyBool(attrs.GoodForKids) || 'Not specified' %>
+        </div>
+
+        <div class="attribute-item">
+          <strong>Good for groups:</strong>
+          <%= prettyBool(attrs.RestaurantsGoodForGroups) || 'Not specified' %>
+        </div>
+
+        <div class="attribute-item">
+          <strong>Alcohol:</strong>
+          <%= prettySimple(attrs.Alcohol) || 'Not specified' %>
+        </div>
+
+        <div class="attribute-item">
+          <strong>Price range:</strong>
+          <%= attrs.RestaurantsPriceRange2 ? attrs.RestaurantsPriceRange2 + ' / 4' : 'Not specified' %>
+        </div>
+
+        <div class="attribute-item">
+          <strong>Parking:</strong>
+          <%= extractTrueLabels(attrs.BusinessParking) || 'No parking info' %>
+        </div>
+
+        <div class="attribute-item">
+          <strong>Good for meal:</strong>
+          <%= extractTrueLabels(attrs.GoodForMeal) || 'Not specified' %>
+        </div>
+
+        <div class="attribute-item">
+          <strong>Ambience:</strong>
+          <%= extractTrueLabels(attrs.Ambience) || 'Not specified' %>
+        </div>
+
+        <div class="attribute-item">
+          <strong>Music:</strong>
+          <%= extractTrueLabels(attrs.Music) || 'Not specified' %>
+        </div>
+
+      </div>
+    </div>
+  <% } %>
+
+  <hr class="divider">
+
   <!-- Reviews -->
-  <h3>Reviews</h3>
+  <h3 class="section-title">Reviews</h3>
   <% reviews.forEach(r => { %>
     <div class="review-item">
       <div class="review-header">
@@ -127,6 +290,21 @@
       <div class="review-by">By <strong><%= r.user_name %></strong></div>
     </div>
   <% }) %>
+
+   <% if (restaurant.location && restaurant.location.latitude && restaurant.location.longitude) { %>
+    <div class="map-container">
+        <iframe 
+            width="100%" 
+            height="300" 
+            style="border:0; border-radius: 12px; margin-top: 15px;"
+            loading="lazy"
+            allowfullscreen
+            src="https://maps.google.com/maps?q=<%= restaurant.location.latitude %>,<%= restaurant.location.longitude %>&z=15&output=embed">
+        </iframe>
+    </div>
+<% } %>
+
+
 </div> 
 
 </div>

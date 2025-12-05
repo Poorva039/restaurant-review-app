@@ -127,11 +127,33 @@
                 (review.photos && review.photos.length > 0 && review.photos[0].photo_url) ||
                 'https://via.placeholder.com/800x350?text=No+Image';
 
+            const fullAddress = review.location
+    ? [
+        review.location.address,
+        review.location.city,
+        review.location.state,
+        review.location.postal_code
+      ].filter(Boolean).join(', ')
+    : '';
+
+const coordsHtml =
+    review.location && review.location.latitude && review.location.longitude
+        ? `
+            <div class="meta">
+                Coordinates: ${review.location.latitude}, ${review.location.longitude}
+                • <a href="https://www.google.com/maps?q=${review.location.latitude},${review.location.longitude}"
+                     target="_blank" rel="noopener">
+                      View on map
+                  </a>
+            </div>
+          `
+        : '';
+
             content.innerHTML = `
                 <div class="card">
                     <div class="business-name">${review.business_name}</div>
                     <div class="meta">
-                        ${review.location && review.location.city ? review.location.city : ''}
+                        ${fullAddress}
                         ${review.categories && review.categories.length ? ' • ' + review.categories.join(', ') : ''}
                         • Reviewed on ${new Date(review.review_date).toLocaleDateString()}
                     </div>
@@ -146,12 +168,14 @@
                     <div class="byline">
                         By <strong>${review.user_name}</strong>
                     </div>
+                    ${coordsHtml}
                     <div style="margin-top: 20px; display: flex; gap: 10px;">
                         <button class="btn btn-primary" onclick="editReview()">Edit Review</button>
                         <button class="btn btn-danger" onclick="deleteReview()">Delete Review</button>
                     </div>
                 </div>
             `;
+
         } catch (err) {
             console.error(err);
             content.innerHTML = `<div class="card error">Server error while loading review.</div>`;
